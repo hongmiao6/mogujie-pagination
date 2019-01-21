@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>蘑菇街分页</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div class="waterfall-container">
+
+    </div>
+    <div class="swiper-pagination">
+        <!-- 分页 -->
+    </div>
+  </body>
+
+  <script src="http://libs.baidu.com/jquery/1.11.3/jquery.js"></script>
+  <script src="art-template.js"></script>
+  <script src="pagination.js"></script>
+  <script type="text/html" id="waterfall-box">
+    <!-- 模板 -->
+    <!-- 遍历list 这个list就是我们的请求回来的接口数据中的需要用到的数据  res.result.wall里的list-->
+    <!-- item就是list中的每一项  i是下标 -->
+    {{each list item i}}
+    <div class="waterfall-box">
+            <div class="img-box">
+                  <img src={{item.show.img}} alt="">
+            </div>
+            <div class="title-box">
+                  <p>{{item.title}}</p>
+            </div>
+            <div class="detail-box">
+                  <div class="start">
+                        <span>{{item.cfav}}</span>
+                        ☆
+                  </div>
+                  <div class="price">
+                        <span class="orgin">{{item.orgPrice}}</span>
+                        <span>{{item.price}}</span>
+                  </div>
+            </div>
+      </div>
+      {{/each}}
+  </script>
+  <script>
+
+    //    1.请求数据
+    $.ajax("https://list.mogujie.com/search", {
+      dataType: "jsonp"
+    }).then(render);
+
+    // 2、渲染页面
+    function render(res) {
+      // console.log(res)
+      // template后面第一个参数是模板的id名 (写在script标签上的id名)
+      // var html = template("waterfall-box", res.result.wall);
+      var list = res.result.wall.list; 
+      var showNum = 5// 声明一个变量 这里可以随时改每页显示的图片数 分页插件会自动计算页数
+     
+    // 3、分页
+       $(".swiper-pagination").pagination({
+        totalData : list.length,//总数据：40条
+        showData : showNum,//每页显示5条  
+        callback : page//用来改变 页码的
+      });
+      function page(api){
+        var min = (api.getCurrent() - 1 ) * showNum;
+        var max =  api.getCurrent() * showNum ;
+        var html = template("waterfall-box",{list:list.slice( min ,max )});
+          
+        $(".waterfall-container").html(html);
+        }
+        // 当前页默认第一页 不加的话callback第一次不会执行，它是在分页函数执行后才会执行 只有点击了才会被执行
+        // 所以，我们第一页的内容就自己先调用一下 page这个函数 第一页就会显示了 api里有一个getCurrent方法 直接传递调用即可
+      page({
+          getCurrent : function(){
+               return 1;
+                }
+           })
+    }  
+  </script>
+  <!-- 使用template是为了更好的去维护 让语义化更清晰 我们在上面的script(模板)标签中布局页面 在下面的script标签中处理数据 达到分层的目的 -->
+  <!-- 为啥要用模板  分层分层分层  mvc -->
+  <!-- M  数据层   V视图层(模板)view    C 控制层(进行数据操作)controller -->
+
+
+  <!-- 这里template后面也可以用花括号的形式去写 list是自己起的key名，可以在模板中直接使用(即遍历的对象可以写成花括号里的key)
+    第1页 0-5 第二页 5-10 页数和页面显示条数的规律所得 5*(当前页-1),5*当前页  ==> getCurrent()
+  分页插件会自动计算页数 即8页
+  现在页面将40条数据全部显示面 而我们需要它每一页显示5张 即0-5 5-10  10-15.. 利用数组slice截取方法实现 让页面渲染时，一次性只显示5条数据
+  现在每页显示5条以实现 但是如何实现点击页码进行跳转呢  分页插件的api callback(回调函数，参数"index"为当前页)即可实现 -->
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+    <style>
+        *{
+            margin:0;
+            padding: 0;
+        }
+      .container {
+        width: 1200px;
+        margin: 0 auto;
+        background: skyblue;
+      }
+      .box {
+        width: 215px;
+        height: 420px;
+        border: 1px solid #ddd;
+        margin-right: 5px;
+        margin-top:10px;
+        float: left;
+      }
+      .pic img {
+        width: 100%;
+        height: 322px;
+        display: block;
+      }
+      .content{
+          height: 99px;
+          background: rgb(245, 241, 241);
+          padding: 0 5px;
+      }
+      .tit{
+          height:60px;
+          font-size: 13px;
+          color:rgb(83, 78, 78);
+      }
+      span{
+        font-size: 12px;
+        color:rgb(210, 30, 114);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+      <!-- <div class="box">
+        <div class="pic"><img src="https://s11.mogucdn.com/mlcdn/c45406/181115_00d06795e7aceg7858le3jj497j7e_640x960.jpg"/></div>
+        <div class="content">
+                <div class="tit">面冬季新款韩版加厚保暖时尚中长款棉服宽松面包服小个子连帽大毛领羽绒棉衣外套女</div>
+                <div><span class="old" style="margin-right:50px">原价：￥234</span><span class="new">现价：￥134</span></div>
+        </div>
+      </div> -->
+    
+    </div>
+  </body>
+  <script src="http://libs.baidu.com/jquery/1.11.3/jquery.js"></script>
+  <script src="art-template.js"></script>
+  <script src="pagination.js"></script>
+  <script type="text/html" id="box">
+    {{each list item i}}
+    <div class="box">
+        <div class="pic"><img src={{item.show.img}}/></div>
+        <div class="content">
+                <div class="tit">{{item.title}}</div>
+                <div><span class="old" style="margin-right:35px">原价：{{item.orgPrice}}</span><span class="new">现价：{{item.price}}</span></div>
+        </div>
+    </div>
+    {{/each}}
+ </script>
+  <script>
+    $.ajax("https://list.mogujie.com/search", {
+      dataType: "jsonp"
+    }).then(render);
+
+    function render(res) {
+    console.log(res.result.wall.list)
+      var list = res.result.wall.list;
+      var html = template('box',{list :list});
+      $('.container').html(html);
+    }
+  </script>
+</html>
